@@ -1,0 +1,595 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>自學小品工作坊 | 學習筆記 - Android 版面 - #3 Notification</title>
+<style type="text/css">
+<!--
+body {
+	font: 100%/1.4 Verdana, Arial, Helvetica, sans-serif;
+	background-color:#CCEEFF;
+	margin: 0;
+	padding: 0;
+	color: #000;
+}
+
+/* ~~ 元素/標籤選取器 ~~ */
+ul, ol, dl { /* 由於瀏覽器之間的差異，最佳作法是在清單中使用零寬度的欄位間隔及邊界。為了保持一致，您可以在這裡指定所要的量，或在清單包含的清單項目 (LI、DT、DD) 上指定所要的量。請記住，除非您寫入較為特定的選取器，否則在此執行的作業將重疊顯示到 .nav 清單。 */
+	padding: 0;
+	margin: 0;
+}
+h1, h2, h3, h4, h5, h6, p {
+	margin-top: 0;	 /* 移除上方邊界可以解決邊界可能從其包含的 Div 逸出的問題。剩餘的下方邊界可以保持 Div 不與接在後面的元素接觸。 */
+	padding-right: 15px;
+	padding-left: 15px; /* 將欄位間隔加入至 Div 內元素的兩側 (而不是 Div 本身)，即可不需執行任何方塊模型的計算作業。具有側邊欄位間隔的巢狀 Div 也可當做替代方法。 */
+}
+a img { /* 這個選取器會移除某些瀏覽器在影像由連結所圍繞時，影像周圍所顯示的預設藍色邊框 */
+	border: none;
+}
+
+/* ~~ 網站連結的樣式設定必須保持此順序，包括建立滑過 (Hover) 效果的選取器群組在內。~~ */
+a:link {
+	color:#414958;
+	text-decoration: underline; /* 除非您要設定非常獨特的連結樣式，否則最好提供底線，以便快速看出 */
+}
+a:visited {
+	color: #4E5869;
+	text-decoration: underline;
+}
+a:hover, a:active, a:focus { /* 這個選取器群組可以讓使用鍵盤導覽的使用者，也和使用滑鼠的使用者一樣擁有相同的滑過體驗。 */
+	text-decoration: none;
+}
+
+/* ~~ 這個容器環繞著所有其他的 Div，並依百分比設定其寬度 ~~ */
+.container {
+	width: 85%;
+	max-width: 1260px;/* 建議您使用最大寬度，如此版面在大型螢幕上就不致於過寬，讓行保持比較方便閱讀的長度。IE6 並不適用這項宣告。 */
+	min-width: 780px;/* 建議您使用最小寬度，如此版面在大型螢幕上就不致於過窄，讓行在側欄中保持比較方便閱讀的長度。IE6 並不適用這項宣告。 */
+	background-color: #FFF;
+	margin: 0 auto; /* 兩側的自動值與寬度結合後，版面便會置中對齊。如果將 .container 的寬度設為 100%，就不需要這麼做。 */
+}
+
+/* ~~ 頁首沒有指定的寬度，而會橫跨版面的整個寬度。頁首包含影像預留位置，必須由您自己的連結商標加以取代 ~~ */
+.header {
+	float:left;
+	width:25%;
+	height:100%;
+	background-color: #FFFFFF;
+}
+.header2 {
+	float:left;
+	
+	width:75%;
+	height:151;
+	
+	background-color: #FFFFFF;
+	}
+
+/* ~~ 這是版面的欄位。~~ 
+
+1) 欄位間隔只會置於 Div 的頂端或底部。這些 Div 內的元素在兩側會有欄位間隔，可讓您不需進行「方塊模型計算」。請記住，如果對 Div 本身加入任何側邊的欄位間隔或邊框，在計算「總」寬度時，就會將這些加入您定義的寬度。您也可以選擇移除 Div 中元素的欄位間隔，然後在其中放置沒有寬度的第二個 Div，並依設計所需放置欄位間隔。
+
+2) 尚未為這些欄位提供邊界，因為它們全都是浮動的。如果必須加入邊界，請避免將其放在浮動方向的一側 (例如將右邊界放在設定為向右浮動的 Div 上)。在許多時候，您都可以改用欄位間隔。對於必須違反此規則的 Div，您應該在 Div 的規則中加入 "display:inline" 宣告，以防止某些版本的 Internet Explorer 將邊界加倍。
+
+3) 因為可在文件中多次使用類別 (也可對單一的元素套用多個類別)，所以已為欄位指定類別名稱，而非 ID。例如，您可在必要時將兩個側邊列 Div 堆疊起來。如有需要，也可以將這些名稱輕鬆地變更為 ID (只要您在每份文件中只使用一次)。
+
+4) 如果想要將導覽放在右方而非左方，只要將這些欄設定為往反方向浮動 (全部往右，而非全部往左)，它們就會以相反順序呈現。您不需要在 HTML 原始碼中移動 Div。
+
+*/
+.sidebar1 {
+	float: left;
+	width: 15%;
+	background-color: #FFFFFF;
+	padding-bottom: 10px;
+}
+.content {
+	padding: 10px 0;
+	margin-left:10px; 
+	width: 84%;
+	float: left;
+}
+.post-header-line-1{
+	margin-top:10px;
+	border-bottom-style:solid;
+	border-top-style:solid;
+	border-top-color:#CCEEFF;
+	border-bottom-color:#CCEEFF ;
+}
+
+/* ~~ 這個群組選取器會在 .content 區域空間中提供清單 ~~ */
+.content ul, .content ol { 
+	padding: 0 15px 15px 40px; /* 這個欄位間隔反映出上方標題和段落規則中的右方間隔。當欄位間隔位於下方時，便可將清單中的其他元素間隔開來；當位於左方時，則可藉此建立縮排。這些動作均可依需要進行調整。 */
+}
+
+/* ~~ 導覽清單樣式 (如果選擇使用 Spry 之類的預製飛出選單，則可移除) ~~ */
+ul.nav {
+	list-style: none; /* 這會移除清單標記 */
+	border-top: 1px solid #FFF; /* 這會建立連結的上方邊框，其他則都會使用下方邊框放置在 LI 上 */
+	margin-bottom: 15px; /* 這會在下方的內容上建立導覽間的間距 */
+}
+ul.nav li {
+	border-bottom: 1px solid #FFF; /* 這會建立按鈕分隔 */
+}
+ul.nav a, ul.nav a:visited { /* 將這些選取器放入群組，即可確保您的連結即使在受到點擊後仍保有按鈕外觀 */
+	padding: 5px 5px 5px 15px;
+	display: block; /* 這會為連結提供區塊屬性，使連結能填滿包含它的整個 LI，讓整個區域都能回應滑鼠點按動作。 */
+	text-decoration: none;
+	background-color: #FFF;
+	color: #000;
+}
+ul.nav a:hover, ul.nav a:active, ul.nav a:focus { /* 這會同時變更滑鼠及鍵盤導覽器的背景及文字顏色 */
+	background-color: #6F7D94;
+	color: #FFF;
+}
+
+/* ~~ 頁尾 ~~ */
+.footer {
+	padding: 10px 0;
+	background-color: #FFCC66;
+	position: relative;/* 這會為 IE6 提供 hasLayout 以進行適當的清除動作 */
+	clear: both; /* 這個 clear 屬性可以強制 .container 辨識欄結束於何處以及包含欄的位置 */
+}
+
+/* ~~ 其他 float/clear 類別 ~~ */
+.fltrt {  /* 這個類別可用來讓元素在頁面中浮動，浮動的元素必須位於頁面上相鄰的元素之前。 */
+	float: right;
+	margin-left: 8px;
+}
+.fltlft { /* 這個類別可用來讓元素在頁面左方浮動，浮動的元素必須位於頁面上相鄰的元素之前。 */
+	float: left;
+	margin-right: 8px;
+
+
+
+}
+.clearfloat { /* 這個類別可放置在 <br /> 或空白的 Div 上，當做接在 #container 內最後一個浮動 Div 後方的最後一個元素 (如果從 #container 移除或取出 #footer) */
+	clear:both;
+	height:0;
+	font-size: 1px;
+	line-height: 0px;
+}
+.j1 {
+	color: #999;
+}
+.j1 {
+	color: #CCC;
+}
+.j2 {
+	color: #999;
+}
+-->
+</style><!--[if lte IE 7]>
+<style>
+.content { margin-right: -1px; } /* 這個 1 像素的負邊界可放在此版面中的任何欄上，而具有相同的修正效果。 */
+ul.nav a { zoom: 1; }  /* zoom 屬性可為 IE 提供修正連結之間多餘空白時所需的 hasLayout 觸發。 */
+</style>
+<![endif]-->
+<script type="text/javascript">
+function MM_swapImgRestore() { //v3.0
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+}
+function MM_preloadImages() { //v3.0
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+}
+
+function MM_findObj(n, d) { //v4.01
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+  if(!x && d.getElementById) x=d.getElementById(n); return x;
+}
+
+function MM_swapImage() { //v3.0
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+}
+</script>
+</head>
+
+<body onload="MM_preloadImages('a1_1.gif','a2_1.gif','a3_1.gif','a4_1.gif','a5_5.gif','a6_1.gif')">
+ <script language="JavaScript">
+    <!--
+      self.moveTo(0,0)
+      self.resizeTo(screen.availWidth,screen.availHeight)
+    //-->
+    </script>
+
+<div class="container">
+
+  <div class="header"><a href="index.html"><img src="Loge.jpg" alt="自學小品工作坊" name="Insert_logo" width="100%" height="152" id="Insert_logo" style="background-color: #8090AB; display:block;" /></a><!-- end .header --> 
+  </div>
+  <div class="header2">
+  <table width="100%" height="152" border="0"><tr align="left" valign="bottom">
+   <td><a href="Introduction.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image1','','a1_1.gif',1)"><img src="a1.gif" width="155" height="50" id="Image1" /></a><a href="java.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image2','','a2_1.gif',1)"><img src="a2.gif" width="155" height="50" id="Image2" /></a><a href="Works_Flash.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image3','','a3_1.gif',1)"><img src="a3.gif" width="155" height="50" id="Image3" /></a><a href="love_link.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image6','','a6_1.gif',1)"><img src="a6.gif" width="155" height="50" id="Image6" /></a></td>
+  </tr>
+  </table>
+  </div>
+  
+    
+    <div class="sidebar1">
+    <ul class="nav">
+    
+      <li><a href="java.html"><img src="e1.gif" width="155" height="50" /></a></li>
+      <li><a href="Android.html"><img src="e3.gif" width="155" height="50" /></a></li>
+      <li><a href="html.html"><img src="e4.gif" width="155" height="50" /></a></li>
+      <li><a href="Flash.html"><img src="e5.gif" width="155" height="50" /></a></li>
+      <li><a href="Draw.html"><img src="e6.gif" width="155" height="50" /></a></li>
+    
+    </ul>
+   
+  <!-- end .sidebar1 --></div>
+  <div class="content">
+  <div class='post-header'>&nbsp;&nbsp;
+   <a href="index.html">首頁</a> > <a href="java.html">學習筆記 </a>> <a href="Android.html">Android</a> > <a href="android3.html">#3&nbsp;&nbsp;Notification</a>
+   <div class='post-header-line-1'>
+  <h2>#3&nbsp;&nbsp;Notification</h2>
+   </div>
+</div>
+<div class='post-body entry-content' id='post-body-2433974340184510410' itemprop='description articleBody' style="margin-left:40px; margin-right:60px;">
+ <span style="font-size: large;">
+</span></div>
+<table border="1"><tbody>
+<tr><td><span style="font-size: large;">1</span></td><td><span style="font-size: large;">setContentTitle(CharSequence)</span></td><td><span style="font-size: large;">通知標題。</span></td></tr>
+<tr><td><span style="font-size: large;">2</span></td><td><span style="font-size: large;">setLargeIcon(Bitmap)</span></td><td><span style="font-size: large;">若無設定，此位置將出現 small icon 圖示。</span></td></tr>
+<tr><td><span style="font-size: large;">3</span></td><td><span style="font-size: large;">setContentText(CharSequence)</span></td><td><span style="font-size: large;">通知內容，最多一行(靠左)。</span></td></tr>
+<tr><td><span style="font-size: large;">4</span></td><td><span style="font-size: large;">setContentInfo(CharSequence)</span>
+<span style="font-size: large;">setNumber(int)</span></td><td><span style="font-size: large;">可設定文字或數字(靠右)。可用來表示未讀訊息數量。</span></td></tr>
+<tr><td><span style="font-size: large;">5</span></td><td><span style="font-size: large;">setSmallIcon(int rid)</span></td><td><span style="font-size: large;">若 large icon 無設定，此處將不會出現圖示(移至 large icon 位置顯示)。</span></td></tr>
+<tr><td><span style="font-size: large;">6</span></td><td><span style="font-size: large;">setWhen(long)</span></td><td><span style="font-size: large;">預設為顯示發出通知時，裝置當時時間。</span></td></tr>
+</tbody></table>
+<span style="font-size: large;">
+</span> <span style="font-size: large;">
+</span> <span style="font-size: large;">
+</span> <span style="font-size: large;">一個簡單的例子：</span>
+<span style="font-size: large;">
+</span> 
+<div class="codeblock">
+<pre><span style="font-size: large;">Notification notification = new NotificationCompat.builder().setSmallIcon(R.drawable.ic_launcher)
+                                .setContentTitle("這是標題")
+                                .setContentText("這是內容")
+                                                            .build();
+
+NotificationManager ntfMgr = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+
+ntfMgr.notify(NOTIFICATION_ID, ntf);
+</span></pre>
+</div>
+<span style="font-size: large;">
+</span> <span style="font-size: large;">
+</span> <span style="font-size: large;">
+</span> <span style="font-size: large;">
+</span> <span style="font-size: large;">
+</span> <span style="font-size: large;">其他設定：</span>
+<table border="1"><tbody>
+<tr><td><span style="font-size: large;">setTicker</span></td><td><span style="font-size: large;">若有設定，系統發出通知，設定值會出現在 notification area。</span></td></tr>
+<tr><td><span style="font-size: large;">setAutoCancel</span></td><td><span style="font-size: large;">true 代表點擊通知後會刪除通知 ； false 則否(預設)。</span></td></tr>
+<tr><td><span style="font-size: large;">setOngoing</span></td><td><span style="font-size: large;">true 代表無法透過滑動或 all clear 鍵刪除，必須呼叫 Manager 方法。</span></td></tr>
+<tr><td><span style="font-size: large;">setContent</span></td><td><span style="font-size: large;">設定自訂樣式</span></td></tr>
+<tr><td><span style="font-size: large;">setContentIntent</span></td><td><span style="font-size: large;">點擊通知會觸發 Intent。</span></td></tr>
+<tr><td><span style="font-size: large;">setDeleteIntent</span></td><td><span style="font-size: large;">刪除通知會觸發 Intent。</span></td></tr>
+<tr><td><span style="font-size: large;">setFullScreenIntent</span></td><td><span style="font-size: large;">當發出通知時，直接觸發 Intent</span></td></tr>
+<tr><td><span style="font-size: large;">setDefaults</span></td><td><span style="font-size: large;">設定是否使用預設 Light、Sound、Vibrate。參數可使用 NotificationCompat 類別常數 ：</span>
+<ul>
+<li><span style="font-size: large;">DEFAULT_ALL</span></li>
+<li><span style="font-size: large;">DEFAULT_LIGHTS</span></li>
+<li><span style="font-size: large;">DEFAULT_SOUND</span></li>
+<li><span style="font-size: large;">DEFAULT_VIBRATE</span></li>
+</ul>
+</td></tr>
+<tr><td><span style="font-size: large;">setLights</span></td><td><span style="font-size: large;">設定LED燈。</span></td></tr>
+<tr><td><span style="font-size: large;">setSound</span></td><td><span style="font-size: large;">設定音效。</span></td></tr>
+<tr><td><span style="font-size: large;">setVibrate</span></td><td><span style="font-size: large;">設定震動。需添加 permission</span>
+<span style="font-size: large;">&lt;uses-permission android:name="android.permission.VIBRATE"/&gt;</span></td></tr>
+<tr><td><span style="font-size: large;">setPriority</span></td><td><span style="font-size: large;">設定優先值。影響 icon 在 notification 顯示位置，參數可使用 NotificationCompat 類別常數 ：</span>
+<ul>
+<li><span style="font-size: large;">PRIORITY_MAX</span></li>
+<li><span style="font-size: large;">PRIORITY_HIGH</span></li>
+<li><span style="font-size: large;">PRIORITY_DEFAULT</span></li>
+<li><span style="font-size: large;">PRIORITY_LOW</span></li>
+<li><span style="font-size: large;">PRIORITY_MIN</span></li>
+</ul>
+</td></tr>
+<tr><td><span style="font-size: large;">setProgress</span></td><td><span style="font-size: large;">設定進度條</span></td></tr>
+<tr><td><span style="font-size: large;">setShowWhen</span></td><td><span style="font-size: large;">設定是否顯示時間。</span></td></tr>
+<tr><td><span style="font-size: large;">setUsesChronometer</span></td><td><span style="font-size: large;">true 表示時間位置變為計時功能</span></td></tr>
+<tr><td><span style="font-size: large;">setStyle</span></td><td><span style="font-size: large;">設定樣式</span></td></tr>
+<tr><td><span style="font-size: large;">setSubText</span></td><td></td></tr>
+<tr><td><span style="font-size: large;">setOnlyAlertOnce</span></td><td><span style="font-size: large;">true 在更新同ID通知時不會有提示</span></td></tr>
+</tbody></table>
+<span style="font-size: large;">
+</span> 
+<div>
+<span style="font-size: large;">
+</span></div>
+<div>
+<span style="font-size: large;">
+</span></div>
+<div>
+<span style="font-size: large;">
+</span></div>
+<div>
+<span style="font-size: large;">
+</span></div>
+<h2>
+<span style="font-size: x-large;"> 三. Expanded Layout</span></h2>
+<div>
+<span style="font-size: large;">&nbsp; &nbsp; &nbsp; &nbsp; 在 Android 4.1 以後支援更<span style="background-color: white;">多型式的 notification，BigPictureStyle、BigTextStyle、InboxStyle，可以透過 Builder 的 setStyle(<a href="http://developer.android.com/reference/android/support/v4/app/NotificationCompat.Style.html" style="font-family: Roboto, sans-serif; line-height: 19px; margin-bottom: 0px; text-decoration: none; white-space: nowrap;"><span style="color: black;">NotificationCompat.Style</span></a><span style="color: #222222; font-family: Roboto, sans-serif; line-height: 19px; white-space: nowrap;">&nbsp;style</span>) 設</span>定，此外還能在展開區域增添按鈕，expanded layout 功能有版本限定，在不同版本的處理上需要特別注意，在設計可展開區域之前，務必確認所有展開區塊功能都能在 Activity 內實現。</span></div>
+<div>
+<span style="font-size: large;">
+</span></div>
+<div>
+<span style="background-color: white; font-size: large;">&lt;註&gt;NotificationCompat.BigPictureStyle、NotificationCompat.BigTextStyle、NotificationCompat.InboxStyle，為&nbsp;<span style="color: black; font-family: Roboto, sans-serif; line-height: 19px; margin-bottom: 0px; text-decoration: none; white-space: nowrap;">NotificationCompat.Style&nbsp;的子類別。</span></span></div>
+<div>
+<span style="background-color: white; color: black; font-family: Roboto, sans-serif; font-size: large; line-height: 19px; margin-bottom: 0px; text-decoration: none; white-space: nowrap;">
+</span></div>
+<div>
+<span style="background-color: white; color: black; font-family: Roboto, sans-serif; font-size: large; line-height: 19px; margin-bottom: 0px; text-decoration: none; white-space: nowrap;">&lt;註&gt;要展開閉合 Notification 使用放大縮小手勢</span></div>
+<div>
+<span style="background-color: white; color: black; font-family: Roboto, sans-serif; font-size: large; line-height: 19px; margin-bottom: 0px; text-decoration: none; white-space: nowrap;">
+</span></div>
+<h3>
+<span style="background-color: white; font-size: large;"><span style="color: black; font-family: Roboto, sans-serif; line-height: 19px; margin-bottom: 0px; text-decoration: none; white-space: nowrap;">(一)</span><span style="color: black; font-family: Roboto, sans-serif; line-height: 19px; margin-bottom: 0px; text-decoration: none; white-space: nowrap;">&nbsp;</span>BigPictureStyle</span></h3>
+<div>
+<span style="font-size: large;">&nbsp; &nbsp; &nbsp; &nbsp; 展開 notification 可以看到一張大圖，寬度為手機寬，高度最高到 256 dp。</span></div>
+<div>
+<span style="font-size: large;">
+</span></div>
+<div>
+<span style="font-size: large;">
+</span></div>
+<table border="1"><tbody>
+<tr><td><span style="font-size: large;">bigPicture(bitmap b)</span></td><td><span style="font-size: large;">設定大圖圖案。</span></td></tr>
+<tr><td><span style="font-size: large;">bigLargeIcon(Bitmap b)</span></td><td><span style="font-size: large;">設定展開後 large icon 位置圖示。</span></td></tr>
+<tr><td><span style="font-size: large;">setBigContentTitle(CharSequence title)</span></td><td><span style="font-size: large;">設定展開後通知標題。</span></td></tr>
+<tr><td><span style="font-size: large;">setSummaryText(CharSequence cs)</span></td><td><span style="font-size: large;">設定展開後通知內容。若無設定，展開後原先text、number、small icon 將消失(API 17 )</span></td></tr>
+</tbody></table>
+<span style="font-size: large;">
+</span> 
+<div>
+<span style="font-size: large;">
+</span></div>
+<div class="codeblock">
+<pre><span style="font-size: large;">Bitmap bigPic = BitmapFactory.decodeResource(getResources(), R.drawable.penguins);
+Bitmap bigLargeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_action_refresh);
+Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_action_new);
+    
+NotificationCompat.BigPictureStyle bigPicStyle = new NotificationCompat.BigPictureStyle();
+bigPicStyle.bigPicture(bigPic)
+    .bigLargeIcon(bigLargeIcon)
+    .setBigContentTitle("title after extand")
+    .setSummaryText("SummaryText");
+      
+Notification notification = new NotificationCompat.Builder(getApplicationContext()).setSmallIcon(R.drawable.ic_launcher)
+             .setContentText("this is text")
+                                                                     .setContentTitle("this is title")
+                                                                                   .setLargeIcon(largeIcon)
+                                                                                   .setStyle(bigPicStyle)
+                                                                                   .build();
+</span></pre>
+</div>
+<span style="font-size: large;">
+</span> <span style="font-size: large;">
+</span> 
+<h3>
+<span style="font-size: large;"> (二)&nbsp;<span style="background-color: white;">BigTextStyle</span></span></h3>
+<div>
+<span style="background-color: white; font-size: large;">&nbsp; &nbsp; &nbsp; &nbsp; 原本樣式的 notification 的內容只能顯示一行，使用 BigTextStyle 可在展開空間顯示多行文字。</span>
+<span style="font-size: large;"><span style="background-color: white;">
+</span> <span style="background-color: white;">
+</span></span></div>
+<div>
+<table border="1"><tbody>
+<tr><td><span style="font-size: large;">bigText(CharSequence cs)</span></td><td><span style="font-size: large;">設定展開後顯示的文字。</span></td></tr>
+<tr><td><span style="font-size: large;">setBigContentTitle(CharSequence title)</span></td><td><span style="font-size: large;">設定展開後通知標題。</span></td></tr>
+<tr><td><span style="font-size: large;">setSummaryText(CharSequence cs)</span></td><td><span style="font-size: large;">設定展開後通知內容。若無設定，展開後原先text、number、small icon 將消失(API 17 )</span></td></tr>
+</tbody></table>
+</div>
+<div>
+<span style="font-size: large;">
+</span></div>
+<div>
+<span style="font-size: large;">
+</span></div>
+<div class="codeblock">
+<pre><span style="font-size: large;">String msg = "沙漠裡，一個快渴死的黑人撿到一個神燈，燈神給予黑人三個願望，黑人想了良久說出了他的願望："
+           + "一.希望天天有水喝，二.希望能夠變成白人，三.希望能夠天天看到女人的屁股。只聽轟然一聲，黑人變成了～\"馬桶\"！";
+
+Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_action_new);
+
+NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
+bigTextStyle.bigText(msg)
+            .setBigContentTitle("神燈")
+            .setSummaryText("可閉合");
+
+    
+Notification notification = new NotificationCompat.Builder(getApplicationContext()).setSmallIcon(R.drawable.ic_launcher)
+                                                                                   .setContentText("展開繼續閱讀")
+                                                                                   .setContentTitle("笑話一則")
+                                                                                   .setLargeIcon(largeIcon)
+                                                                                   .setStyle(bigTextStyle)
+                                                                                   .build();</span></pre>
+</div>
+<span style="font-size: large;">
+</span> <span style="font-size: large;">
+</span> 
+<h3>
+<span style="font-size: large;">(三)&nbsp;<span style="background-color: white; color: #333333; font-family: Roboto, sans-serif; line-height: 30px;">InboxStyle</span></span></h3>
+<div>
+<span style="font-size: large;"><span style="background-color: white; color: #333333; font-family: Roboto, sans-serif; line-height: 30px;">&nbsp; &nbsp; &nbsp; &nbsp; 展開內容為列表樣式，最多可以顯示5條項目。</span></span></div>
+<div>
+<span style="font-size: large;"><span style="background-color: white; color: #333333; font-family: Roboto, sans-serif; line-height: 30px;">
+</span></span></div>
+<div>
+<span style="font-size: large;"><span style="background-color: white; color: #333333; font-family: Roboto, sans-serif; line-height: 30px;">
+</span></span></div>
+<table border="1"><tbody>
+<tr><td><span style="font-size: large;">addLine(CharSequence cs)</span></td><td><span style="font-size: large;">呼叫一次增加一項資料。</span></td></tr>
+<tr><td><span style="font-size: large;">setBigContentTitle(CharSequence title)</span></td><td><span style="font-size: large;">設定展開後通知標題。</span></td></tr>
+<tr><td><span style="font-size: large;">setSummaryText(CharSequence cs)</span></td><td><span style="font-size: large;">設定展開後通知內容。若無設定，展開後原先text、number、small icon 將消失(API 17 )</span></td></tr>
+</tbody></table>
+<span style="font-size: large;">
+</span> 
+<div class="codeblock">
+<pre><span style="font-size: large;">String[] str = {"待辦事項1","待辦事項2","待辦事項3"};
+
+Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_action_new);
+
+NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+
+for(String s : str){
+    inboxStyle.addLine(s);
+}
+inboxStyle.setBigContentTitle("待辦事項(展開)")
+          .setSummaryText("盡快完成");
+
+Notification notification = new NotificationCompat.Builder(getApplicationContext()).setSmallIcon(R.drawable.ic_launcher)
+                                                                                   .setContentText("待辦事項")
+                                                                                   .setContentTitle("展開查看")
+                                                                                   .setLargeIcon(largeIcon)
+                                                                                   .setStyle(inboxStyle)
+                                                                                   .build();</span></pre>
+</div>
+<span style="font-size: large;">
+</span> 
+<h3>
+<span style="font-size: large;"> (四) Notification with button</span></h3>
+<div>
+<span style="font-size: large;">&nbsp; &nbsp; &nbsp; &nbsp; Android 4.1 後的版本允許在通知的展開區域放置按鈕，按鈕和上面三種 style 可以共存。加入按鈕有兩種方式：</span></div>
+<div>
+<ul>
+<li><span style="background-color: white; font-family: monospace; font-size: large; line-height: 14px; text-decoration: none;">addAction(int, CharSequence, PendingIntent)</span></li>
+<li><span style="background-color: white; font-size: large;"><code style="font-stretch: normal; line-height: 14px;">addAction(NotificationCompat.Action)</code></span></li>
+</ul>
+<div>
+<span style="font-family: monospace;"><span style="font-size: large; line-height: 14px;">兩個都是 NotificationCompat.Builder 類別的方法，這邊示範較第一個方法。</span></span></div>
+</div>
+<div>
+<span style="font-family: monospace;"><span style="font-size: large; line-height: 14px;">
+</span></span></div>
+
+<div>
+<span style="font-family: monospace;"><span style="font-size: large; line-height: 14px;">
+</span></span></div>
+<div>
+<span style="font-size: large;">
+</span></div>
+<span style="font-size: large;">
+</span> 
+<div class="codeblock">
+<pre><span style="font-size: large;">Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+PendingIntent pintent=PendingIntent.getActivity(MainActivity.this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+
+Notification notification = new NotificationCompat.builder().setSmallIcon(R.drawable.ic_launcher)
+                                .setContentTitle("這是標題")
+                                .setContentText("這是內容")
+                                                            <span style="color: red;">.addAction(R.drawable.ic_action_call, "btn", pintent)</span>
+                                                            .build();
+
+NotificationManager ntfMgr = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+
+ntfMgr.notify(NOTIFICATION_ID, ntf);
+</span></pre>
+</div>
+<span style="font-size: large;">
+</span> <span style="font-size: large;">
+</span> 
+<h2>
+<span style="font-size: x-large;"> 四. 通知發送與刪除</span></h2>
+<div>
+<span style="font-size: large;">&nbsp; &nbsp; &nbsp; &nbsp; Notification 的發送與刪除是系統後台所控制，而 getSystemService() 函數是應用程式和系統服務的接口，透過取得的 NotificationManager 物件可以實現通知的發送與刪除。</span></div>
+<div>
+<span style="font-size: large;">
+</span></div>
+<div>
+<span style="font-size: large;">發送：</span></div>
+<div>
+<ul>
+<li><span style="font-size: large;">notify(int id , Notification notification)，發送並給予一識別 id，當此 id 已存在狀態列，不會再次發送只會更新通知。</span></li>
+</ul>
+</div>
+<div>
+<span style="font-size: large;">&nbsp;刪除：</span></div>
+<div>
+<ul>
+<li><span style="font-size: large;">cancel(int id)，刪除特定通知。</span></li>
+<li><span style="font-size: large;">cancelAll()，刪除全部。</span></li>
+</ul>
+<div>
+<span style="font-size: large;">
+</span></div>
+</div>
+<h2>
+<span style="font-size: x-large;"> 五. Progress in notification</span></h2>
+<div>
+<span style="font-size: large;">&nbsp; &nbsp; &nbsp; &nbsp; 通知中放置進度條可以告訴使用者任務當前進度，通常會加上 setOngoing(true) ，讓使用者無法手動刪除，有顯示進度的通知會透過不斷更新通知，達到動態顯示當前進度的目的，所以通常在通知提示的部分不會有聲音或震動...。</span></div>
+<div>
+<span style="font-size: large;">
+</span></div>
+<div>
+<span style="font-size: large;">&nbsp; &nbsp; &nbsp; &nbsp; 設置進度條使用 setProgress(int max, int progress, boolean indeterminate) ，第三個參數若為 true，則顯示圓形循環圖；false，為長條圖。要移除 progress bar 同樣使用setProgress()，參數設為(0 , 0 , false)，並 update notification。</span>
+<span style="font-size: large;">
+</span> <span style="font-size: large;">
+</span> <span style="font-size: large;">
+</span></div>
+<div class="codeblock">
+<pre><span style="font-size: large;">builder = new NotificationCompat.Builder(getApplicationContext()).setSmallIcon(R.drawable.ic_launcher)
+                                .setContentText("0%")
+                                .setContentTitle("下載進度")
+                                .setOngoing(true)
+                                .setOnlyAlertOnce(true);    <span style="color: #6aa84f;">//更新不提示</span>
+
+new Thread(){
+
+    @Override
+    public void run() {
+        <span style="color: #6aa84f;">//有進度的進度條</span>
+        for(int value = 0 ; value &lt;= 100 ; value += 10){
+            builder.<span style="color: red;">setProgress(100, value, false)</span>.setContentText(String.valueOf(value) + "%");
+            ntfMgr.notify(0 , builder.build());
+
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+       <span style="color: #b6d7a8;"> </span><span style="color: #6aa84f;">//無進度的進度條
+        /*
+        builder.setProgress(0 , 0 , true);
+        ntfMgr.notify(0 , builder.build());
+
+        try {
+                Thread.sleep(30000);
+        } catch (InterruptedException e) {
+                e.printStackTrace();
+        }
+        */</span>
+
+        builder.<span style="color: red;">setProgress(0, 0, false)</span>
+               .setContentTitle("下載完成")
+               .setOngoing(false);
+        ntfMgr.notify(0 , builder.build());
+    };
+}.start();</span></pre>
+</div>
+<span style="font-size: large;">
+</span> <span style="font-size: large;">
+</span> 
+<h2>
+<span style="font-size: x-large;"> 六. 客製化 Layout</span></h2>
+<div>
+<span style="font-size: large;">&nbsp; &nbsp; &nbsp; &nbsp; 透過 setContext(RemoteViews) 將客製化 layout 導入，可以使用 XML檔設定 layout ，normal view 高度上限為 64 dp ; expanded view 高度上限為 256 dp，layout 內的元件，可透過RemoteViews 內的方法去設定。</span>
+</div>
+<div class="Tab" style="margin-bottom:10px; margin-top:5px; font-size:18px;">
+<p align="center"><b class="j2"><a href="android2.html">上一篇</a></b>/<b>  <a href="android4.html">下一篇</a></b></p></div> 
+  </div>
+  <div class="footer">
+     <p align="center" ><b>© &nbsp;自學小品工作坊</b>&nbsp;&nbsp;&nbsp;&nbsp;聯絡信箱: <a href="#">a081206a@gmail.com</a>&nbsp;&nbsp;&nbsp;&nbsp;更新日期: <em>2015/05/31</em></p>
+    <!-- end .footer --></div>
+<!-- end .container --></div>
+</body>
+</html>

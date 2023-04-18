@@ -1,0 +1,466 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>自學小品工作坊 | 學習筆記 - Android 版面 -#1 View Animation (1) --- Tween animation</title>
+<style type="text/css">
+<!--
+body {
+	font: 100%/1.4 Verdana, Arial, Helvetica, sans-serif;
+	background-color:#CCEEFF;
+	margin: 0;
+	padding: 0;
+	color: #000;
+}
+
+/* ~~ 元素/標籤選取器 ~~ */
+ul, ol, dl { /* 由於瀏覽器之間的差異，最佳作法是在清單中使用零寬度的欄位間隔及邊界。為了保持一致，您可以在這裡指定所要的量，或在清單包含的清單項目 (LI、DT、DD) 上指定所要的量。請記住，除非您寫入較為特定的選取器，否則在此執行的作業將重疊顯示到 .nav 清單。 */
+	padding: 0;
+	margin: 0;
+}
+h1, h2, h3, h4, h5, h6, p {
+	margin-top: 0;	 /* 移除上方邊界可以解決邊界可能從其包含的 Div 逸出的問題。剩餘的下方邊界可以保持 Div 不與接在後面的元素接觸。 */
+	padding-right: 15px;
+	padding-left: 15px; /* 將欄位間隔加入至 Div 內元素的兩側 (而不是 Div 本身)，即可不需執行任何方塊模型的計算作業。具有側邊欄位間隔的巢狀 Div 也可當做替代方法。 */
+}
+a img { /* 這個選取器會移除某些瀏覽器在影像由連結所圍繞時，影像周圍所顯示的預設藍色邊框 */
+	border: none;
+}
+
+/* ~~ 網站連結的樣式設定必須保持此順序，包括建立滑過 (Hover) 效果的選取器群組在內。~~ */
+a:link {
+	color:#414958;
+	text-decoration: underline; /* 除非您要設定非常獨特的連結樣式，否則最好提供底線，以便快速看出 */
+}
+a:visited {
+	color: #4E5869;
+	text-decoration: underline;
+}
+a:hover, a:active, a:focus { /* 這個選取器群組可以讓使用鍵盤導覽的使用者，也和使用滑鼠的使用者一樣擁有相同的滑過體驗。 */
+	text-decoration: none;
+}
+
+/* ~~ 這個容器環繞著所有其他的 Div，並依百分比設定其寬度 ~~ */
+.container {
+	width: 85%;
+	max-width: 1260px;/* 建議您使用最大寬度，如此版面在大型螢幕上就不致於過寬，讓行保持比較方便閱讀的長度。IE6 並不適用這項宣告。 */
+	min-width: 780px;/* 建議您使用最小寬度，如此版面在大型螢幕上就不致於過窄，讓行在側欄中保持比較方便閱讀的長度。IE6 並不適用這項宣告。 */
+	background-color: #FFF;
+	margin: 0 auto; /* 兩側的自動值與寬度結合後，版面便會置中對齊。如果將 .container 的寬度設為 100%，就不需要這麼做。 */
+}
+
+/* ~~ 頁首沒有指定的寬度，而會橫跨版面的整個寬度。頁首包含影像預留位置，必須由您自己的連結商標加以取代 ~~ */
+.header {
+	float:left;
+	width:25%;
+	height:100%;
+	background-color: #FFFFFF;
+}
+.header2 {
+	float:left;
+	
+	width:75%;
+	height:151;
+	
+	background-color: #FFFFFF;
+	}
+
+/* ~~ 這是版面的欄位。~~ 
+
+1) 欄位間隔只會置於 Div 的頂端或底部。這些 Div 內的元素在兩側會有欄位間隔，可讓您不需進行「方塊模型計算」。請記住，如果對 Div 本身加入任何側邊的欄位間隔或邊框，在計算「總」寬度時，就會將這些加入您定義的寬度。您也可以選擇移除 Div 中元素的欄位間隔，然後在其中放置沒有寬度的第二個 Div，並依設計所需放置欄位間隔。
+
+2) 尚未為這些欄位提供邊界，因為它們全都是浮動的。如果必須加入邊界，請避免將其放在浮動方向的一側 (例如將右邊界放在設定為向右浮動的 Div 上)。在許多時候，您都可以改用欄位間隔。對於必須違反此規則的 Div，您應該在 Div 的規則中加入 "display:inline" 宣告，以防止某些版本的 Internet Explorer 將邊界加倍。
+
+3) 因為可在文件中多次使用類別 (也可對單一的元素套用多個類別)，所以已為欄位指定類別名稱，而非 ID。例如，您可在必要時將兩個側邊列 Div 堆疊起來。如有需要，也可以將這些名稱輕鬆地變更為 ID (只要您在每份文件中只使用一次)。
+
+4) 如果想要將導覽放在右方而非左方，只要將這些欄設定為往反方向浮動 (全部往右，而非全部往左)，它們就會以相反順序呈現。您不需要在 HTML 原始碼中移動 Div。
+
+*/
+.sidebar1 {
+	float: left;
+	width: 20%;
+	background-color: #FFFFFF;
+	padding-bottom: 10px;
+}
+.content {
+	padding: 10px 0;
+	margin-left:10px; 
+	width: 75%;
+	float: left;
+}
+.post-header-line-1{
+	margin-top:10px;
+	border-bottom-style:solid;
+	border-top-style:solid;
+	border-top-color:#CCEEFF;
+	border-bottom-color:#CCEEFF ;
+}
+
+/* ~~ 這個群組選取器會在 .content 區域空間中提供清單 ~~ */
+.content ul, .content ol { 
+	padding: 0 15px 15px 40px; /* 這個欄位間隔反映出上方標題和段落規則中的右方間隔。當欄位間隔位於下方時，便可將清單中的其他元素間隔開來；當位於左方時，則可藉此建立縮排。這些動作均可依需要進行調整。 */
+}
+
+/* ~~ 導覽清單樣式 (如果選擇使用 Spry 之類的預製飛出選單，則可移除) ~~ */
+ul.nav {
+	list-style: none; /* 這會移除清單標記 */
+	border-top: 1px solid #FFF; /* 這會建立連結的上方邊框，其他則都會使用下方邊框放置在 LI 上 */
+	margin-bottom: 15px; /* 這會在下方的內容上建立導覽間的間距 */
+}
+ul.nav li {
+	border-bottom: 1px solid #FFF; /* 這會建立按鈕分隔 */
+}
+ul.nav a, ul.nav a:visited { /* 將這些選取器放入群組，即可確保您的連結即使在受到點擊後仍保有按鈕外觀 */
+	padding: 5px 5px 5px 15px;
+	display: block; /* 這會為連結提供區塊屬性，使連結能填滿包含它的整個 LI，讓整個區域都能回應滑鼠點按動作。 */
+	text-decoration: none;
+	background-color: #FFF;
+	color: #000;
+}
+ul.nav a:hover, ul.nav a:active, ul.nav a:focus { /* 這會同時變更滑鼠及鍵盤導覽器的背景及文字顏色 */
+	background-color: #6F7D94;
+	color: #FFF;
+}
+
+/* ~~ 頁尾 ~~ */
+.footer {
+	padding: 10px 0;
+	background-color: #FFCC66;
+	position: relative;/* 這會為 IE6 提供 hasLayout 以進行適當的清除動作 */
+	clear: both; /* 這個 clear 屬性可以強制 .container 辨識欄結束於何處以及包含欄的位置 */
+}
+
+/* ~~ 其他 float/clear 類別 ~~ */
+.fltrt {  /* 這個類別可用來讓元素在頁面中浮動，浮動的元素必須位於頁面上相鄰的元素之前。 */
+	float: right;
+	margin-left: 8px;
+}
+.fltlft { /* 這個類別可用來讓元素在頁面左方浮動，浮動的元素必須位於頁面上相鄰的元素之前。 */
+	float: left;
+	margin-right: 8px;
+
+
+}
+.clearfloat { /* 這個類別可放置在 <br /> 或空白的 Div 上，當做接在 #container 內最後一個浮動 Div 後方的最後一個元素 (如果從 #container 移除或取出 #footer) */
+	clear:both;
+	height:0;
+	font-size: 1px;
+	line-height: 0px;
+}
+.j1 {
+	color: #999;
+}
+.j1 {
+	color: #CCC;
+}
+.j2 {
+	color: #999;
+}
+-->
+</style><!--[if lte IE 7]>
+<style>
+.content { margin-right: -1px; } /* 這個 1 像素的負邊界可放在此版面中的任何欄上，而具有相同的修正效果。 */
+ul.nav a { zoom: 1; }  /* zoom 屬性可為 IE 提供修正連結之間多餘空白時所需的 hasLayout 觸發。 */
+</style>
+<![endif]-->
+<script type="text/javascript">
+function MM_swapImgRestore() { //v3.0
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+}
+function MM_preloadImages() { //v3.0
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+}
+
+function MM_findObj(n, d) { //v4.01
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+  if(!x && d.getElementById) x=d.getElementById(n); return x;
+}
+
+function MM_swapImage() { //v3.0
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+}
+</script>
+</head>
+
+<body onload="MM_preloadImages('a1_1.gif','a2_1.gif','a3_1.gif','a4_1.gif','a5_5.gif','a6_1.gif')">
+ <script language="JavaScript">
+    <!--
+      self.moveTo(0,0)
+      self.resizeTo(screen.availWidth,screen.availHeight)
+    //-->
+    </script>
+
+<div class="container">
+
+  <div class="header"><a href="index.html"><img src="Loge.jpg" alt="自學小品工作坊" name="Insert_logo" width="100%" height="152" id="Insert_logo" style="background-color: #8090AB; display:block;" /></a><!-- end .header --> 
+  </div>
+  <div class="header2">
+  <table width="100%" height="152" border="0"><tr align="left" valign="bottom">
+   <td><a href="Introduction.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image1','','a1_1.gif',1)"><img src="a1.gif" width="155" height="50" id="Image1" /></a><a href="java.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image2','','a2_1.gif',1)"><img src="a2.gif" width="155" height="50" id="Image2" /></a><a href="Works_Flash.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image3','','a3_1.gif',1)"><img src="a3.gif" width="155" height="50" id="Image3" /></a><a href="love_link.html" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image6','','a6_1.gif',1)"><img src="a6.gif" width="155" height="50" id="Image6" /></a></td>
+  </tr>
+  </table>
+  </div>
+  
+    
+    <div class="sidebar1">
+    <ul class="nav">
+    
+      <li><a href="java.html"><img src="e1.gif" width="155" height="50" /></a></li>
+      <li><a href="Android.html"><img src="e3.gif" width="155" height="50" /></a></li>
+      <li><a href="html.html"><img src="e4.gif" width="155" height="50" /></a></li>
+      <li><a href="Flash.html"><img src="e5.gif" width="155" height="50" /></a></li>
+      <li><a href="Draw.html"><img src="e6.gif" width="155" height="50" /></a></li>
+    
+    </ul>
+    
+  <!-- end .sidebar1 --></div>
+  <div class="content">
+  <div class='post-header'>&nbsp;&nbsp;
+   <a href="index.html">首頁</a> > <a href="java.html">學習筆記 </a>> <a href="Android.html">Android</a> > <a href="android1.html">#1&nbsp;&nbsp;View Animation (1) --- Tween animation</a>
+   <div class='post-header-line-1'>
+  <h2>#1&nbsp;&nbsp;View Animation (1) --- Tween animation</h2></div>
+</div>
+<div class='post-body entry-content' id='post-body-2433974340184510410' itemprop='description articleBody' style="margin-left:40px; margin-right:60px;">
+  <span style="font-size: large;">Tween animation 指的是兩個圖形間轉換的動畫，Android 提供四種動畫功能：</span>
+<span style="font-size: large;">
+</span> 
+<ul>
+<li><span style="font-size: large;">縮放 (Scale)</span></li>
+<li><span style="font-size: large;">位移 (Translate)</span></li>
+<li><span style="font-size: large;">旋轉 (Rotate)</span></li>
+<li><span style="font-size: large;">透明化 (Alpha)</span></li>
+</ul>
+<div>
+<span style="font-size: large;"></span>
+<!--more--><span style="font-size: large;">
+</span></div>
+<div>
+<span style="font-size: large;">這些功能可以應用在大部分的 UI 元件上，建構動畫的效果，可以透過兩種方式產生：</span></div>
+<div>
+<ol>
+<li><span style="font-size: large;">撰寫XML檔，並存放在 res/anim 資料夾下。</span></li>
+<li><span style="font-size: large;">直接在程式碼內編寫。</span></li>
+</ol>
+<div>
+<span style="font-size: large;">
+</span></div>
+</div>
+<div>
+<span style="font-size: large;">
+</span></div>
+<h3>
+<span style="font-size: large;">四種功能的通用屬性(方法)</span></h3>
+<span style="font-size: large;">
+</span> <span style="font-size: large;">
+</span> 
+<table border="1"><tbody>
+<tr align="center"><td><b><span style="font-size: large;">XML attribute</span></b></td><td><b><span style="font-size: large;">method</span></b></td><td></td></tr>
+<tr>  <td><span style="font-size: large;">android:duration</span></td>  <td><span style="font-size: large;">setDuration(long)</span></td> <td><span style="font-size: large;">動畫播放時間，單位為毫秒</span></td></tr>
+<tr>  <td><span style="font-size: large;">android:fillAfter</span></td>  <td><span style="font-size: large;">setFillAfter(boolean)</span></td> <td><span style="font-size: large;">若為true，動畫停止時，呈現動畫最後一幕。</span></td></tr>
+<tr> <td><span style="font-size: large;">android:fillBefore</span></td>  <td><span style="font-size: large;">setFillBefore(boolean)</span></td><td><span style="font-size: large;">若為true，動畫停止時，呈現 UI <span style="color: red;">原本</span>狀態。</span></td></tr>
+<tr>  <td><span style="font-size: large;">android:fillEnabled</span></td>  <td><span style="font-size: large;">setFillEnabled(boolean)</span></td> <td><span style="font-size: large;">判定是否啟用 fillAfter、fillBefore。</span></td></tr>
+<tr>  <td><span style="font-size: large;">android:interpolator</span></td>  <td><span style="font-size: large;">setInterpolator(Interpolator)</span></td><td><span style="font-size: large;">動畫運行時的效果(變化速度)，主要使原先的功能，再增添加速、減速、重複等效果</span></td></tr>
+<tr>  <td><span style="font-size: large;">android:repeatCount</span></td>  <td><span style="font-size: large;">setRepeatCount(int)</span></td><td><span style="font-size: large;">重複播放次數。</span>
+<span style="font-size: large;">-1：無限播放，預設值為 0 (不重複)</span></td></tr>
+<tr>  <td><span style="font-size: large;">android:repeatMode</span></td>  <td><span style="font-size: large;">setRepeatMode(int)</span></td><td><span style="font-size: large;"><span style="color: red;">重複播放</span>模式。</span>
+<span style="font-size: large;">restart (Animation.RESTART)(default)；</span>
+<span style="font-size: large;">reverse (Animation.REVERSE)</span></td></tr>
+<tr>  <td><span style="font-size: large;">android:startOffset</span></td>  <td><span style="font-size: large;">setStartOffset(long)</span></td><td><span style="font-size: large;">兩動畫間的間隔時間，用來避免動畫重疊。</span></td></tr>
+</tbody></table>
+<span style="font-size: large;">
+</span> 
+<h3>
+</h3>
+<h4>
+<table border="1"><caption> </caption> <tbody>
+<tr><td><div style="text-align: center;">
+<b><span style="font-size: large;">Interpolator class</span></b></div>
+</td><td><div style="text-align: center;">
+<b><span style="font-size: large;">Resource ID</span></b></div>
+</td><td><span style="font-size: large;">
+</span></td></tr>
+<tr><td><span style="font-size: large;">AccelerateDecelerateInterpolator</span></td><td><span style="font-size: large;">@android:anim/accelerate_decelerate_interpolator</span></td><td><span style="font-size: large;">先加速再減速</span></td></tr>
+<tr><td><span style="font-size: large;">AccelerateInterpolator</span></td><td><span style="font-size: large;">@android:anim/accelerate_interpolator</span></td><td><span style="font-size: large;">加速</span></td></tr>
+<tr><td><span style="font-size: large;">AnticipateInterpolator</span></td><td><span style="font-size: large;">@android:anim/anticipate_interpolator</span></td><td><span style="font-size: large;">先後退再向前</span></td></tr>
+<tr><td><span style="font-size: large;">AnticipateOvershootInterpolator</span></td><td><span style="font-size: large;">@android:anim/anticipate_overshoot_interpolator</span></td><td><span style="font-size: large;">先後退再向前超過終點，最後出現在終點</span></td></tr>
+<tr><td><span style="font-size: large;">BounceInterpolator</span></td><td><span style="font-size: large;">@android:anim/bounce_interpolator</span></td><td><span style="font-size: large;">彈力球效果</span></td></tr>
+<tr><td><span style="font-size: large;">CycleInterpolator</span></td><td><span style="font-size: large;">@android:anim/cycle_interpolator</span></td><td><span style="font-size: large;">反彈(原點-&gt;終點-&gt;原點)</span></td></tr>
+<tr><td><span style="font-size: large;">DecelerateInterpolator</span></td><td><span style="font-size: large;">@android:anim/decelerate_interpolator</span></td><td><span style="font-size: large;">減速</span></td></tr>
+<tr><td><span style="font-size: large;">LinearInterpolator</span></td><td><span style="font-size: large;">@android:anim/linear_interpolator</span></td><td><span style="font-size: large;">等速</span></td></tr>
+<tr><td><span style="font-size: large;">OvershootInterpolator</span></td><td><span style="font-size: large;">@android:anim/overshoot_interpolator</span></td><td><span style="font-size: large;">超過終點後再出現在終點位置</span></td></tr>
+</tbody><caption> </caption><caption><span style="font-size: large;"><b>Interpolator </b></span></caption></table>
+</h4>
+<a href="http://my.oschina.net/banxi/blog/135633" target="_blank">Interpolator 深入研究</a>
+<span style="font-size: large;">
+</span> <span style="font-size: large;">
+</span> 
+<div>
+<span style="font-size: large;">若要設定反彈(抖動)次數，可建一 Tag 為 &lt;cycleInterpolator&gt; 的XML檔，並將此檔指派給 android:interpolator="@anim/file_name"&nbsp;</span></div>
+<div>
+<span style="font-size: large;">
+</span></div>
+<div>
+<pre><span style="background-color: #fff2cc; font-size: large;">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;cycleInterpolator xmlns:android="http://schemas.android.com/apk/res/android"
+<span class="Apple-tab-span" style="white-space: pre;"> </span>android:cycles="7"</span></pre>
+<pre><span style="background-color: #fff2cc; font-size: large;">&lt;!--來回7次--&gt;</span></pre>
+<pre><span style="background-color: #fff2cc; font-size: large;">/&gt;</span></pre>
+</div>
+<div>
+</div>
+<span style="font-size: large;">
+</span> <span style="font-size: large;">
+</span> 
+<h3>
+<b><span style="font-size: large;">XML檔撰寫方式：</span></b></h3>
+<span style="font-size: large;">&nbsp; &nbsp; &nbsp; &nbsp; 根標籤可以為 &lt;set&gt;、&lt;translate&gt;、&lt;scale&gt;、&lt;rotate&gt;、&lt;alpha&gt; 之一，並存放於 res/anim 目錄下。</span>
+<span style="font-size: large;">
+</span> <span style="font-size: large;">
+</span> 
+<h4>
+<span style="font-size: large;">&lt;set&gt;&nbsp;</span></h4>
+<span style="font-size: large;">&nbsp; &nbsp; &nbsp; &nbsp; 為一個容器，可以擁有多種功能屬性(&lt;translate&gt;、&lt;scale&gt;、&lt;rotate&gt;、&lt;alpha&gt;)，或 &lt;set&gt; 屬性，可用來表示多種功能同時進行的動畫，對應的類別為 AnimationSet。</span>
+<span style="font-size: large;">
+</span> 
+<table border="1"><caption> </caption> <tbody>
+<tr><td><div style="text-align: center;">
+<b><span style="font-size: large;">attribute </span></b></div>
+</td><td></td></tr>
+<tr><td><span style="font-size: large;">android:shareInterpolator</span></td><td><span style="font-size: large;">若為 true ，則將 android:interpolator 套用至所有子屬性。</span></td></tr>
+</tbody></table>
+<span style="font-size: large;">
+</span> 
+<hr />
+<span style="font-size: large;">
+</span> 
+<h4>
+<span style="font-size: large;">&lt;alpha&gt;</span></h4>
+<div>
+<span style="font-size: large;">&nbsp; &nbsp; &nbsp; &nbsp; 透明化功能，可表現淡入 (fade-in) 淡出 (fade-out)，對應類別為 AlphaAnimation。</span></div>
+<div>
+<span style="font-size: large;">
+</span></div>
+<div>
+<span style="font-size: large;">
+</span></div>
+<table border="1"><tbody>
+<tr><td><div style="text-align: center;">
+<b><span style="font-size: large;">attribute</span></b></div>
+</td><td></td></tr>
+<tr><td><span style="font-size: large;">android:fromAlpha</span></td><td><span style="font-size: large;">初始透明度。Float 型別，可為0.0(透明)~1.0(不透明)。</span></td></tr>
+<tr><td><span style="font-size: large;">android:toAlpha</span></td><td><span style="font-size: large;">最後透明度。Float 型別，可為0.0(透明)~1.0(不透明)。</span></td></tr>
+</tbody></table>
+<span style="font-size: large;">
+</span> 
+<hr />
+<h4>
+<span style="font-size: large;">
+</span></h4>
+<h4>
+<span style="font-size: large;">&lt;scale&gt;</span></h4>
+<div>
+<span style="font-size: large;">&nbsp; &nbsp; &nbsp; &nbsp; 縮放功能。可指定縮放中心點位置，若為(0，0)，則放大時將只會朝右邊及下面拓展。對應類別為 ScaleAnimation。</span></div>
+<span style="font-size: large;">
+</span> <span style="font-size: large;">
+</span> 
+<table border="1"><tbody>
+<tr><td style="text-align: center;"><b><span style="font-size: large;">attribute</span></b></td><td><span style="font-size: large;">
+</span></td></tr>
+<tr><td><span style="font-size: large;">android:fromXScale</span></td><td><span style="font-size: large;">初始X軸方向大小。Float 型別，1.0表示原始大小。</span></td></tr>
+<tr><td><span style="font-size: large;">android:toXScale</span></td><td><span style="font-size: large;">最終X軸方向大小。Float 型別，1.0表示原始大小。</span></td></tr>
+<tr><td><span style="font-size: large;">android:fromYScale</span></td><td><span style="font-size: large;">初始Y軸方向大小。Float 型別，1.0表示原始大小。</span></td></tr>
+<tr><td><span style="font-size: large;">android:toYScale</span></td><td><span style="font-size: large;">最終Y軸方向大小。Float 型別，1.0表示原始大小。</span></td></tr>
+<tr><td><span style="font-size: large;">android:pivotX</span></td><td><span style="font-size: large;">縮放時X軸方向中心點。Float or Percentage 型別。</span></td></tr>
+<tr><td><span style="font-size: large;">android:pivotY</span></td><td><span style="font-size: large;">縮放時Y軸方向中心點。Float or Percentage 型別。</span></td></tr>
+</tbody></table>
+<span style="font-size: large;">
+</span> 
+<hr />
+<h4 style="text-align: left;">
+<span style="font-size: large;">&lt;translate&gt;</span></h4>
+<div>
+<span style="font-size: large;">&nbsp; &nbsp; &nbsp; &nbsp; 垂直和水平移動。參數可以有三種型式：</span></div>
+<div>
+<ol>
+<li><span style="font-size: large;">%結尾，表示相對於自身位置，-100% ~ 100%</span></li>
+<li><span style="font-size: large;">%p結尾，表示相對於 parent view 位置，-100%p ~ 100%p</span></li>
+<li><span style="font-size: large;">絕對座標</span></li>
+</ol>
+<div>
+<span style="font-size: large;">對應的類別為 TranslateAnimation。</span>
+<span style="font-size: large;">
+</span></div>
+</div>
+<table border="1"><tbody>
+<tr><td><div style="text-align: center;">
+<b><span style="font-size: large;">attribute</span></b></div>
+</td><td><span style="font-size: large;">
+</span></td></tr>
+<tr><td><span style="font-size: large;">android:fromXDelta</span></td><td><span style="font-size: large;">初始X軸方向位置。Float or Percentage 型別</span></td></tr>
+<tr><td><span style="font-size: large;">android:toXDelta</span></td><td><span style="font-size: large;">最終X軸方向位置。Float or Percentage 型別</span></td></tr>
+<tr><td><span style="font-size: large;">android:fromYDelta</span></td><td><span style="font-size: large;">初始Y軸方向位置。Float or Percentage 型別</span></td></tr>
+<tr><td><span style="font-size: large;">android:toYDelta</span></td><td><span style="font-size: large;">最終Y軸方向位置。Float or Percentage 型別</span></td></tr>
+</tbody></table>
+<span style="font-size: large;">
+</span> 
+<hr />
+<h4 style="text-align: left;">
+<span style="font-size: large;">&lt;rotate&gt;</span></h4>
+<div>
+<span style="font-size: large;">&nbsp; &nbsp; &nbsp; &nbsp; 旋轉功能，中心點屬性(pivot)參數與 &lt;translate&gt; 一樣有三種，對應類別為 RotateAnimation。</span></div>
+<div>
+<span style="font-size: large;">
+</span></div>
+<span style="font-size: large;">
+</span> 
+<table border="1"><tbody>
+<tr><td><div style="text-align: center;">
+<b><span style="font-size: large;">attribute</span></b></div>
+</td><td></td></tr>
+<tr> </tr>
+<tr><td><span style="font-size: large;">android:fromDegrees</span></td><td><span style="font-size: large;">初始旋轉角度。Float 型別，順時針方向為正。</span></td></tr>
+<tr><td><span style="font-size: large;">android:toDegrees</span></td><td><span style="font-size: large;">最終旋轉角度。Float 型別，順時針方向為正。</span></td></tr>
+<tr><td><span style="font-size: large;">android:pivotX</span></td><td><span style="font-size: large;">旋轉時X軸方向中心點。Float or Percentage 型別。</span></td></tr>
+<tr><td><span style="font-size: large;">android:pivotY</span></td><td><span style="font-size: large;">旋轉時Y軸方向中心點。Float or Percentage 型別。</span></td></tr>
+</tbody></table>
+<span style="font-size: large;">
+</span> 
+<hr />
+<span style="font-size: large;">
+</span> 
+<div>
+<span style="font-size: large;">建立動畫XML檔後，若要使元件產生動畫效果，</span></div>
+<div>
+<ol>
+<li><span style="font-size: large;">需先透過 XML 檔的 id 取得 Animation 物件</span></li>
+</ol>
+<div>
+<span style="font-size: large;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 使用 AnimationUtils 類別的</span>
+<span style="font-size: large;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; public &nbsp;static &nbsp;Animation &nbsp;loadAnimation (Context &nbsp;context &nbsp;, &nbsp;int &nbsp;id)</span></div>
+<ol start="2">
+<li><span style="font-size: large;">再要求元件開始 Animation 物件的動畫效果</span></li>
+</ol>
+<div>
+<span style="font-size: large;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 使用 View 類別的</span>
+<span style="font-size: large;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; public &nbsp;void &nbsp;startAnimation (Animation animation )</span></div>
+</div>
+<div>
+<span style="font-size: large;">
+</span> <span style="font-size: large;">
+</span> <span style="font-size: large;">PS. TranslateAnimation、ScaleAnimation、RotateAnimation、AlphaAnimation、AnimationSet 皆為 Animation 的子類別，若要在程式中設定動畫效果，產生動畫功能類別物件後，使用 startAnimation(Animation &nbsp;animation)。</span></div>
+</div>
+<div class="Tab" style="margin-bottom:10px; margin-top:5px; font-size:18px;">
+<p align="center"><b class="j2">上一篇  </b>/<b>  <a href="android2.html">下一篇</a></b></p></div> 
+  </div>
+  <div class="footer">
+    <p align="center" ><b>© &nbsp;自學小品工作坊</b>&nbsp;&nbsp;&nbsp;&nbsp;聯絡信箱: <a href="#">a081206a@gmail.com</a>&nbsp;&nbsp;&nbsp;&nbsp;更新日期: <em>2015/05/31</em></p>
+    <!-- end .footer --></div>
+<!-- end .container --></div>
+</body>
+</html>
